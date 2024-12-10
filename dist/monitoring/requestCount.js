@@ -34,12 +34,14 @@ const httpRequestDurationMicroseconds = new prom_client_1.default.Histogram({
 const histogramCount = (req, res, next) => {
     const startTime = Date.now();
     res.on("finish", () => {
-        const endTime = Date.now();
-        httpRequestDurationMicroseconds.observe({
-            method: req.method,
-            route: req.route ? req.route.path : req.path,
-            status_code: res.statusCode,
-        }, endTime - startTime);
+        if (req.path !== "/metrics") {
+            const endTime = Date.now();
+            httpRequestDurationMicroseconds.observe({
+                method: req.method,
+                route: req.route ? req.route.path : req.path,
+                status_code: res.statusCode,
+            }, endTime - startTime);
+        }
     });
     next();
 };
